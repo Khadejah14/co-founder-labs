@@ -75,7 +75,7 @@ def run_matching():
       new_row = pd.DataFrame({
           'Name': [user_name],
           'Email': [email],
-          'Backround': [background],
+          'Background': [background],
           'Goal': [goal],
           'Work style': [work_style]
       })
