@@ -138,7 +138,6 @@
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
- 
 
 st.markdown("""
     <style>
@@ -157,7 +156,7 @@ st.markdown("""
             border: none;
             display: block;
             margin: 0 auto;
-            }
+        }
         div.stButton > button:first-child:hover {
             background-color: #ef9a9a;
         }
@@ -175,18 +174,15 @@ def run_matching():
     st.title("Co-founder Matching")
     st.markdown("Enter your info to get your match")
 
+    # Define your expected columns exactly as in your Google Sheet
+    columns = ['Name', 'Email', 'Background', 'Goal', 'Work style']
+
     # Connect to Google Sheets
     conn = st.connection("gsheets", type=GSheetsConnection)
 
-    background_types = [
-        "Business", "Technical"
-    ]
-    goals = [
-        "Impact", "Outcome"
-    ]
-    work_styles = [
-        "Creative Thinkers", "Practical Doers"
-    ]
+    background_types = ["Business", "Technical"]
+    goals = ["Impact", "Outcome"]
+    work_styles = ["Creative Thinkers", "Practical Doers"]
 
     with st.form(key="Profile_data"):
         user_name = st.text_input(label="Name*")
@@ -198,7 +194,6 @@ def run_matching():
         submit_button = st.form_submit_button(label="Submit")
 
         if submit_button:
-            # Create new data row
             new_row = pd.DataFrame([{
                 'Name': user_name,
                 'Email': email,
@@ -206,25 +201,23 @@ def run_matching():
                 'Goal': goal,
                 'Work style': work_style
             }])
-        # Read existing data from sheet (no cache)
-        existing_data = conn.read(worksheet='Profile_data', usecols=list(range(len(columns))), ttl=0)
 
-        # Handle empty sheet (no columns or rows)
-        if existing_data.empty:
-            updated_data = new_row
-        else:
-            # Make sure columns match
-            existing_data = existing_data.reindex(columns=columns)
-            updated_data = pd.concat([existing_data, new_row], ignore_index=True)
+            # Read existing data fresh without cache
+            existing_data = conn.read(worksheet='Profile_data', usecols=list(range(len(columns))), ttl=0)
 
-        try:
-            # Write full updated data back to sheet
-            conn.update(worksheet='Profile_data', data=updated_data)
-            st.success("Your information has been submitted!")
-        except Exception as e:
-            st.error(f"Error saving data to sheet: {e}")
+            if existing_data.empty:
+                updated_data = new_row
+            else:
+                # Make sure columns match before concatenating
+                existing_data = existing_data.reindex(columns=columns)
+                updated_data = pd.concat([existing_data, new_row], ignore_index=True)
 
-
+            try:
+                # Update sheet with new combined data
+                conn.update(worksheet='Profile_data', data=updated_data)
+                st.success("Your information has been submitted!")
+            except Exception as e:
+                st.error(f"Error saving data to sheet: {e}")
 
 st.title("Muban")
 st.header("a tool to find the right co founder")
@@ -265,6 +258,6 @@ st.write("")
 st.write("Click below to create a profile and start the matching")
 st.write("")
 st.write("")
+
 if st.button("Create a profile"):
     run_matching()
-
