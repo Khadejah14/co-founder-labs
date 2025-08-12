@@ -72,21 +72,24 @@ def run_matching():
 
     # If the form is submitted, process the data
     if submit_button:
-        # Create a new DataFrame row with the input data
-        new_row = pd.DataFrame({
-            'Name': [user_name],
-            'Email': [email],
-            'Backround': [background],
-            'Goal': [goal],
-            'Work style': [work_style]
-        })
-        
-        # Append the new row to the existing data
-        updated_data = pd.concat([existing_data, new_row], ignore_index=True)
-        
-        # Write the updated DataFrame back to the Google Sheet worksheet
-        conn.update(worksheet='Profile_data', data=updated_data)
-        
+    new_row = pd.DataFrame({
+        'Name': [user_name],
+        'Email': [email],
+        'Backround': [background],
+        'Goal': [goal],
+        'Work style': [work_style]
+    })
+
+    # Read the sheet fresh each time without caching
+    existing_data = conn.read(worksheet='Profile_data', usecols=list(range(5)), ttl=0).dropna(how="all")
+
+    # Append the new row
+    updated_data = pd.concat([existing_data, new_row], ignore_index=True)
+
+    # Save back to the sheet
+    conn.update(worksheet='Profile_data', data=updated_data)
+
+    st.success("Your information has been submitted!")
         st.success("Your information has been submitted!")
 st.title("Muban")
 st.header("a tool to find the right co founder")
