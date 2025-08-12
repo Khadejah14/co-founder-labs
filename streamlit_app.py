@@ -197,17 +197,15 @@ def run_matching():
 
         submit_button = st.form_submit_button(label="Submit")
 
-       if submit_button:
-           # Prepare new row with exact column names
-           columns = ['Name', 'Email', 'Background', 'Goal', 'Work style']
-           new_row = pd.DataFrame([{
-               'Name': user_name,
-               'Email': email,
-               'Background': background,
-               'Goal': goal,
-               'Work style': work_style
-           }], columns=columns)
-
+        if submit_button:
+            # Create new data row
+            new_row = pd.DataFrame([{
+                'Name': user_name,
+                'Email': email,
+                'Background': background,
+                'Goal': goal,
+                'Work style': work_style
+            }])
         # Read existing data from sheet (no cache)
         existing_data = conn.read(worksheet='Profile_data', usecols=list(range(len(columns))), ttl=0)
 
