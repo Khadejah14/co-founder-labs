@@ -124,6 +124,8 @@ st.write("")
 st.write("")
 
 st.write("Click below to create a profile and start the matching")
+st.write("")
+st.write("")
 if st.button("Create a profile"):
     run_matching()
 
