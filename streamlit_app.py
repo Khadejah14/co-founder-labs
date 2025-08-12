@@ -175,7 +175,7 @@ def run_matching():
     st.markdown("Enter your info to get your match")
 
     # Define your expected columns exactly as in your Google Sheet
-    columns = ['Name', 'Email', 'Background', 'Goal', 'Work style']
+    
 
     # Connect to Google Sheets
     conn = st.connection("gsheets", type=GSheetsConnection)
@@ -183,6 +183,7 @@ def run_matching():
     background_types = ["Business", "Technical"]
     goals = ["Impact", "Outcome"]
     work_styles = ["Creative Thinkers", "Practical Doers"]
+    columns = ['Name', 'Email', 'Background', 'Goal', 'Work style']
 
     with st.form(key="Profile_data"):
         user_name = st.text_input(label="Name*")
