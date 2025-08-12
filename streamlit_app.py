@@ -132,13 +132,29 @@
 # if st.button("Create a profile"):
 #     # st.write("congrats")
 #     run_matching()
+import streamlit as st
+from streamlit_gsheets import GSheetsConnection
+import pandas as pd
+
+conn = st.connection("gsheets", type=GSheetsConnection)
+
+with st.form(key="test_form"):
+    name = st.text_input("Name")
+    email = st.text_input("Email")
+    submit_button = st.form_submit_button("Submit")
+
 if submit_button:
-    st.write("Form submitted!")
+    new_row = pd.DataFrame({
+        'Name': [name],
+        'Email': [email]
+    })
+
     try:
         conn.update(worksheet='Profile_data', data=new_row)
         st.success("Data saved!")
     except Exception as e:
         st.error(f"Error saving data: {e}")
+
 
 
 #############################################################
