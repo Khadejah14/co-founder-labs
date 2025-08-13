@@ -40,55 +40,43 @@ st.markdown("""
 
 
 def run_matching():
-    # Display title & description
     st.title("Co-founder Matching")
     st.markdown("Enter your info to get your match")
 
-    # Establishing a Google Sheets connection
     conn = st.connection("gsheets", type=GSheetsConnection)
-    existing_data = conn.read(worksheet='Profile_data', usecols=list(range(5)), ttl=5)
-    existing_data = existing_data.dropna(how="all")
+    
+    # List of options...
+    background_types = ["Business", "Technical"]
+    goals = ["Impact", "Outcome"]
+    work_styles = ["Creative Thinkers", "Practical Doers"]
 
-    # List of background, personality, goals & work styles
-    background_types = [
-        "Business", "Technical"
-    ]
-    goals = [
-        "Impact", "Outcome"
-    ]
-    work_styles = [
-        "Creative Thinkers", "Practical Doers"
-    ]
-
-    # Onboarding into co-founder matching form
+    # Form creation
     with st.form(key="Profile_data"):
         user_name = st.text_input(label="Name*")
         email = st.text_input(label="Email*")
         background = st.selectbox("Background*", options=background_types, index=None)
         goal = st.selectbox("Goal*", options=goals)
         work_style = st.selectbox("Work style*", options=work_styles)
-
         submit_button = st.form_submit_button(label="Submit")
 
-    # If the form is submitted, process the data
-        if submit_button:
-          new_row = pd.DataFrame({
-              'Name': [user_name],
-              'Email': [email],
-              'Background': [background],
-              'Goal': [goal],
-              'Work style': [work_style]
-          })
-  
-         # Read the sheet fresh each time without caching
+    # Form submission handling (OUTSIDE the form block)
+    if submit_button:
+        # Create new row
+        new_row = pd.DataFrame({
+            'Name': [user_name],
+            'Email': [email],
+            'Background': [background],
+            'Goal': [goal],
+            'Work style': [work_style]
+        })
+        
+        # Read existing data
         existing_data = conn.read(worksheet='Profile_data', usecols=list(range(5)), ttl=0).dropna(how="all")
-     
-         # Append the new row
+        
+        # Combine and update
         updated_data = pd.concat([existing_data, new_row], ignore_index=True)
-     
-         # Save back to the sheet
         conn.update(worksheet='Profile_data', data=updated_data)
-     
+        
         st.success("Your information has been submitted!")
         
 st.title("Muban")
