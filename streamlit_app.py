@@ -206,7 +206,7 @@ def run_matching():
                     updated_data = pd.concat([existing_data, new_row], ignore_index=True)
                     conn.update(worksheet='Profile_data', data=updated_data)
                     
-                    st.success("✅ Submitted successfully!")
+                    st.success("✅ Submitted successfully!, we'll update you soon by email")
                     st.balloons()
                     st.session_state.show_form = False  # Hide form after successful submission
                     
