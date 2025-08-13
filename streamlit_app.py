@@ -71,14 +71,14 @@ def run_matching():
         submit_button = st.form_submit_button(label="Submit")
 
     # If the form is submitted, process the data
-    if submit_button:
-      new_row = pd.DataFrame({
-          'Name': [user_name],
-          'Email': [email],
-          'Background': [background],
-          'Goal': [goal],
-          'Work style': [work_style]
-      })
+        if submit_button:
+          new_row = pd.DataFrame({
+              'Name': [user_name],
+              'Email': [email],
+              'Background': [background],
+              'Goal': [goal],
+              'Work style': [work_style]
+          })
   
       # Read the sheet fresh each time without caching
       existing_data = conn.read(worksheet='Profile_data', usecols=list(range(5)), ttl=0).dropna(how="all")
