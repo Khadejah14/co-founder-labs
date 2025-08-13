@@ -165,50 +165,35 @@ def run_matching():
     st.title("Co-founder Matching")
     st.markdown("Enter your info to get your match")
 
-    # Establish connection
     conn = st.connection("gsheets", type=GSheetsConnection)
     
-    # Form options
-    background_types = ["Business", "Technical"]
-    goals = ["Impact", "Outcome"]
-    work_styles = ["Creative Thinkers", "Practical Doers"]
-
-    # Form creation
     with st.form(key="Profile_data"):
         user_name = st.text_input(label="Name*")
         email = st.text_input(label="Email*")
-        background = st.selectbox("Background*", options=background_types, index=None)
-        goal = st.selectbox("Goal*", options=goals)
-        work_style = st.selectbox("Work style*", options=work_styles)
-        submit_button = st.form_submit_button(label="Submit")
+        background = st.selectbox("Background*", options=["Business", "Technical"], index=None)
+        goal = st.selectbox("Goal*", options=["Impact", "Outcome"])
+        work_style = st.selectbox("Work style*", options=["Creative Thinkers", "Practical Doers"])
+        submitted = st.form_submit_button("Submit")
 
-    # Form submission
-    if submit_button:
-        # Validate required fields
-        if not all([user_name, email, background, goal, work_style]):
-            st.warning("Please fill all required fields!")
-        else:
-            try:
-                # Prepare data
-                new_row = pd.DataFrame({
-                    'Name': [user_name],
-                    'Email': [email],
-                    'Background': [background],
-                    'Goal': [goal],
-                    'Work style': [work_style]
-                })
-                
-                # Update Google Sheet
-                existing_data = conn.read(worksheet='Profile_data', usecols=list(range(5)), ttl=0).dropna(how="all")
-                updated_data = pd.concat([existing_data, new_row], ignore_index=True)
-                conn.update(worksheet='Profile_data', data=updated_data)
-                
-                # Success message
-                st.success("✅ Your information has been submitted!")
-                st.balloons()
-                
-            except Exception as e:
-                st.error(f"Error saving data: {str(e)}")
+    # This MUST be at the same level as the form (not indented inside it)
+    if submitted:
+        try:
+            new_row = pd.DataFrame({
+                'Name': [user_name],
+                'Email': [email],
+                'Background': [background],
+                'Goal': [goal],
+                'Work style': [work_style]
+            })
+            
+            existing_data = conn.read(worksheet='Profile_data', usecols=list(range(5)), ttl=0).dropna(how="all")
+            updated_data = pd.concat([existing_data, new_row], ignore_index=True)
+            conn.update(worksheet='Profile_data', data=updated_data)
+            
+            st.success("✅ Submitted successfully!")
+            st.balloons()
+        except Exception as e:
+            st.error(f"Error: {e}")
 
 # ========== LANDING PAGE ==========
 st.title("Muban")
