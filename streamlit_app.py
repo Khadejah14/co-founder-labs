@@ -166,17 +166,25 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Initialize debug mode in session state
+if 'debug_mode' not in st.session_state:
+    st.session_state.debug_mode = False
+
 # ========== FORM FUNCTION ==========
 def run_matching():
     st.title("Co-founder Matching")
     st.markdown("Enter your info to get your match")
 
-    # Debugging toggle
-    debug_mode = st.toggle("Show debug info")
+    # Debugging toggle - moved to sidebar
+    st.session_state.debug_mode = st.sidebar.checkbox(
+        "Show debug info", 
+        value=st.session_state.debug_mode,
+        key='debug_toggle'
+    )
     
     try:
         conn = st.connection("gsheets", type=GSheetsConnection)
-        if debug_mode:
+        if st.session_state.debug_mode:
             st.markdown("### 🔧 Connection Established", unsafe_allow_html=True)
     except Exception as e:
         st.error(f"Connection failed: {str(e)}")
@@ -196,7 +204,7 @@ def run_matching():
         submit_button = st.form_submit_button(label="Submit")
 
     if submit_button:
-        if debug_mode:
+        if st.session_state.debug_mode:
             st.markdown("### 🔧 Form Submitted", unsafe_allow_html=True)
             st.write("Form values:", {
                 "Name": user_name,
@@ -219,7 +227,7 @@ def run_matching():
                     'Work style': [work_style]
                 })
                 
-                if debug_mode:
+                if st.session_state.debug_mode:
                     st.markdown("### 🔧 Data Prepared", unsafe_allow_html=True)
                     st.dataframe(new_row)
 
@@ -230,14 +238,14 @@ def run_matching():
                     ttl=0
                 ).dropna(how="all")
                 
-                if debug_mode:
+                if st.session_state.debug_mode:
                     st.markdown("### 🔧 Existing Data", unsafe_allow_html=True)
                     st.dataframe(existing_data)
 
                 # Combine and update
                 updated_data = pd.concat([existing_data, new_row], ignore_index=True)
                 
-                if debug_mode:
+                if st.session_state.debug_mode:
                     st.markdown("### 🔧 Updated Data", unsafe_allow_html=True)
                     st.dataframe(updated_data)
 
@@ -246,12 +254,12 @@ def run_matching():
                 st.success("✅ Your information has been submitted!")
                 st.balloons()
                 
-                if debug_mode:
+                if st.session_state.debug_mode:
                     st.markdown("### 🔧 Update Successful", unsafe_allow_html=True)
                 
             except Exception as e:
                 st.error(f"❌ Error saving data: {str(e)}")
-                if debug_mode:
+                if st.session_state.debug_mode:
                     st.exception(e)
 
 # ========== LANDING PAGE ==========
